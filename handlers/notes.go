@@ -1,23 +1,104 @@
 package handlers
 
-import "net/http"
+import (
+	"encoding/json"
+	"github.com/gorilla/mux"
+	"gratitude/db"
+	"gratitude/models"
+	"io/ioutil"
+	"net/http"
+)
 
-func PostNoteHandler(w http.ResponseWriter, r *http.Request) {
 
+type NoteRequestBody struct {
+	Text	string
+}
+
+type ErrorResponse struct {
+	Message string
 }
 
 func PutNoteHandler(w http.ResponseWriter, r *http.Request) {
+	errorResponse := ErrorResponse{}
 
-}
+	w.Header().Add("Access-Control-Allow-Origin", "*")
+	w.Header().Add("Content-Type", "application/json")
 
-func DeleteNoteHandler(w http.ResponseWriter, r *http.Request) {
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		errorResponse.Message = err.Error()
+		w.WriteHeader(http.StatusBadRequest)
+	}
 
-}
+	note := models.Note{}
 
-func GetOneNoteHandler(w http.ResponseWriter, r *http.Request) {
+	err = json.Unmarshal(body, &note)
+	if err != nil {
+		panic(err)
+	}
 
+	client := db.GetClient()
+	models.CreateNewNote(client, &note)
+
+	if err != nil {
+		errorResponse.Message = err.Error()
+		data, _ := json.Marshal(&errorResponse)
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write(data)
+	}
+
+	w.Header().Add("Access-Control-Allow-Origin", "*")
+	w.Header().Add("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+
+	w.Write(nil)
 }
 
 func GetAllNoteHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Add("Access-Control-Allow-Origin", "*")
+	w.Header().Add("Content-Type", "application/json")
 
+	if ownerID, ok := r.URL.Query()["ownerID"]; !ok || len(ownerID[0]) < 1 {
+		errorResponse := ErrorResponse{
+			Message: "owner id is required",
+		}
+		data, _ := json.Marshal(&errorResponse)
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write(data)
+	} else {
+		client := db.GetClient()
+		notes := models.GetUserNotes(client, ownerID[0])
+		w.WriteHeader(http.StatusOK)
+		data, err := json.Marshal(&notes)
+
+		if err != nil {
+			panic(err)
+		}
+
+		w.Write(data)
+	}
+}
+
+func DeleteNoteHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Add("Access-Control-Allow-Origin", "*")
+	w.Header().Add("Content-Type", "application/json")
+
+
+	params := mux.Vars(r)
+
+	noteUUID := params["uuid"]
+
+	if len(noteUUID) < 1 {
+		errorResponse := ErrorResponse{
+			Message: "note uui id is required",
+		}
+		data, _ := json.Marshal(&errorResponse)
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write(data)
+	} else {
+		client := db.GetClient()
+		models.DeleteNote(client, noteUUID)
+		w.WriteHeader(http.StatusNoContent)
+		w.Write(nil)
+	}
 }

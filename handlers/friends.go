@@ -2,9 +2,6 @@ package handlers
 
 import "net/http"
 
-func PostFriendHandler(w http.ResponseWriter, r *http.Request) {
-
-}
 
 func PutFriendHandler(w http.ResponseWriter, r *http.Request) {
 
