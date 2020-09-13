@@ -41,11 +41,13 @@ func GetUserNotes(client *datastore.Client, ownerID string) []Note {
 	return notes
 }
 
-func GetUserPublicNotes(client *datastore.Client, ownerID string) []Note {
+func GetUserPublicNotes(client *datastore.Client, ownerID string, offset int) []Note {
 	ctx := context.Background()
 	query := datastore.NewQuery("Note").
 		Filter("OwnerID =", ownerID).
-		Filter("IsPublic =", true)
+		Filter("IsPublic =", true).
+		Offset(offset).
+		Limit(20)
 
 	notes := []Note{}
 
