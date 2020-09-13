@@ -8,8 +8,17 @@ import (
 	"gratitude/shared"
 	"io/ioutil"
 	"net/http"
+	"time"
 )
 
+type PutNoteRequestBody struct {
+	UUID       string    `json:"uuid"`
+	Text       string    `json:"text"`
+	IsPublic   bool      `json:"is_public"`
+	OwnerID    string    `json:"owner_id"`
+	Likes      int64     `json:"likes"`
+	Views      int64     `json:"views"`
+}
 
 func PutNoteHandler(w http.ResponseWriter, r *http.Request) {
 	errorResponse := shared.ErrorResponse{}
@@ -23,13 +32,23 @@ func PutNoteHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 	}
 
-	note := models.Note{}
+	noteBody := PutNoteRequestBody{}
 
-	err = json.Unmarshal(body, &note)
+	err = json.Unmarshal(body, &noteBody)
 	if err != nil {
 		panic(err)
 	}
 
+	note := models.Note{
+		UUID:       noteBody.UUID,
+		Text:       noteBody.Text,
+		IsPublic:   noteBody.IsPublic,
+		OwnerID:    noteBody.OwnerID,
+		Likes:      noteBody.Likes,
+		Views:      noteBody.Views,
+		CreateDate: time.Now(),
+	}
+	
 	client := db.GetClient()
 	models.CreateNewNote(client, &note)
 

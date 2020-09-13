@@ -65,17 +65,34 @@ func PutFriendHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write(data)
 }
 
-func DeleteFriendHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Add("Access-Control-Allow-Origin", "*")
-	w.Header().Add("Content-Type", "application/json")
-
-}
-
 func GetOneFriendHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Access-Control-Allow-Origin", "*")
 	w.Header().Add("Content-Type", "application/json")
 
+	email := r.URL.Query()["email"]
 
+	if email == nil || len(email[0]) < 1 {
+		errorResponse := shared.ErrorResponse{
+			Message: "email is required params",
+		}
+
+		data, _ := json.Marshal(errorResponse)
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write(data)
+		return
+	}
+
+	user := models.SearchForFriendByEmail(email[0])
+
+	data, _ := json.Marshal(user)
+
+	if user != nil {
+		w.WriteHeader(http.StatusOK)
+	} else {
+		w.WriteHeader(http.StatusNotFound)
+	}
+
+	w.Write(data)
 }
 
 func GetAllFriendHandler(w http.ResponseWriter, r *http.Request) {
@@ -100,6 +117,31 @@ func GetAllFriendHandler(w http.ResponseWriter, r *http.Request) {
 	friends := models.GetAllFriends(client, ownerID)
 
 	data, _ := json.Marshal(friends)
-	w.WriteHeader(http.StatusCreated)
+	w.WriteHeader(http.StatusOK)
 	w.Write(data)
+}
+
+func DeleteFriendHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Add("Access-Control-Allow-Origin", "*")
+	w.Header().Add("Content-Type", "application/json")
+
+	params := mux.Vars(r)
+
+	uuid := params["uuid"]
+	if len(uuid) < 1 {
+		errorResponse := shared.ErrorResponse{
+			Message: "uuid is required params",
+		}
+
+		data, _ := json.Marshal(errorResponse)
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write(data)
+		return
+	}
+
+	client := db.GetClient()
+	models.DeleteFriend(client, uuid)
+
+	w.WriteHeader(http.StatusNoContent)
+	w.Write(nil)
 }

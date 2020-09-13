@@ -21,18 +21,18 @@ func main() {
 	// Feeds endpoint
 	router.HandleFunc("/feeds", handlers.FeedsHandler).Methods(http.MethodGet)
 
-	// Notes endpoint
+	// Friends endpoint
+	router.HandleFunc("/friends", handlers.PutFriendHandler).Methods(http.MethodPut)
+	router.HandleFunc("/friends/{ownerID}", handlers.GetAllFriendHandler).Methods(http.MethodGet)
+	router.HandleFunc("/friends/{uuid}", handlers.DeleteFriendHandler).Methods(http.MethodDelete)
 
+	// Notes endpoint
 	router.HandleFunc("/notes", handlers.GetAllNoteHandler).Methods(http.MethodGet)
 	router.HandleFunc("/notes", handlers.PutNoteHandler).Methods(http.MethodPut)
 	router.HandleFunc("/notes/{uuid}", handlers.DeleteNoteHandler).Methods(http.MethodDelete)
 
-	// Friends endpoint
-	router.HandleFunc("/friends", handlers.PutFriendHandler).Methods(http.MethodPut)
-	router.HandleFunc("/friends/{ownerID}", handlers.GetAllFriendHandler).Methods(http.MethodGet)
-
-	router.HandleFunc("/friends/search/{email}", handlers.GetOneFriendHandler).Methods(http.MethodGet)
-	router.HandleFunc("/friends/{uuid}", handlers.DeleteFriendHandler).Methods(http.MethodDelete)
+	// Search Endpoint
+	router.HandleFunc("/search", handlers.GetOneFriendHandler).Methods(http.MethodGet)
 
 	log.Println("Server is running on port", port)
 

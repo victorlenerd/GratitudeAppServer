@@ -4,17 +4,17 @@ import (
 	"cloud.google.com/go/datastore"
 	"context"
 	"fmt"
+	"time"
 )
 
 type Note struct {
-	UUID       string `json:"uuid"`
-	Text       string `json:"text"`
-	IsPublic   bool   `json:"is_public"`
-	OwnerID    string `json:"owner_id"`
-	Likes      int64  `json:"likes"`
-	Views      int64  `json:"views"`
-	CreateDate string `json:"create_date"`
-	UpdateDate string `json:"update_date"`
+	UUID       string    `json:"uuid"`
+	Text       string    `json:"text"`
+	IsPublic   bool      `json:"is_public"`
+	OwnerID    string    `json:"owner_id"`
+	Likes      int64     `json:"likes"`
+	Views      int64     `json:"views"`
+	CreateDate time.Time `json:"create_date"`
 }
 
 func CreateNewNote(client *datastore.Client, note *Note) {
@@ -44,7 +44,7 @@ func GetUserNotes(client *datastore.Client, ownerID string) []Note {
 func DeleteNote(client *datastore.Client, noteID string) {
 	ctx := context.Background()
 	key := datastore.NameKey("Note", noteID, nil)
-	err :=  client.Delete(ctx, key)
+	err := client.Delete(ctx, key)
 
 	if err != nil {
 		fmt.Println(err)
