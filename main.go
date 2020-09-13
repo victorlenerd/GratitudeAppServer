@@ -19,7 +19,7 @@ func main() {
 	db.Init(ctx)
 
 	// Feeds endpoint
-	router.HandleFunc("/feeds", handlers.FeedsHandler).Methods(http.MethodGet)
+	router.HandleFunc("/feeds/{uuid}", handlers.FeedsHandler).Methods(http.MethodGet)
 
 	// Friends endpoint
 	router.HandleFunc("/friends", handlers.PutFriendHandler).Methods(http.MethodPut)

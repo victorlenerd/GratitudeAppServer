@@ -41,6 +41,22 @@ func GetUserNotes(client *datastore.Client, ownerID string) []Note {
 	return notes
 }
 
+func GetUserPublicNotes(client *datastore.Client, ownerID string) []Note {
+	ctx := context.Background()
+	query := datastore.NewQuery("Note").
+		Filter("OwnerID =", ownerID).
+		Filter("IsPublic =", true)
+
+	notes := []Note{}
+
+	_, err := client.GetAll(ctx, query, &notes)
+	if err != nil {
+		panic(err)
+	}
+
+	return notes
+}
+
 func DeleteNote(client *datastore.Client, noteID string) {
 	ctx := context.Background()
 	key := datastore.NameKey("Note", noteID, nil)
