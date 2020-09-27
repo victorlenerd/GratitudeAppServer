@@ -15,7 +15,7 @@ const (
 	Declined
 )
 
-type Friend struct {
+type FriendRequest struct {
 	UUID        string
 	UserID      string
 	OwnerID     string
@@ -30,9 +30,14 @@ type FriendInfo struct {
 	Email       string `json:"email"`
 }
 
-func CreateFriends(client *datastore.Client, friend Friend) {
+type FriendContainer struct {
+	friendInfo    FriendInfo    `json:"friend_info"`
+	friendRequest FriendRequest `json:"friend_request"`
+}
+
+func CreateFriends(client *datastore.Client, friend FriendRequest) {
 	ctx := context.Background()
-	key := datastore.NameKey("Friend", friend.UUID, nil)
+	key := datastore.NameKey("FriendRequest", friend.UUID, nil)
 	_, err := client.Put(ctx, key, &friend)
 	if err != nil {
 		panic(err)
@@ -42,10 +47,10 @@ func CreateFriends(client *datastore.Client, friend Friend) {
 func GetAllFriends(client *datastore.Client, ownerID string) []FriendInfo {
 	ctx := context.Background()
 
-	ownerBasedQuery := datastore.NewQuery("Friend").
+	ownerBasedQuery := datastore.NewQuery("FriendRequest").
 		Filter("OwnerID =", ownerID)
 
-	ownerBasedQueryFriends := []Friend{}
+	ownerBasedQueryFriends := []FriendRequest{}
 	_, err := client.GetAll(ctx, ownerBasedQuery, &ownerBasedQueryFriends)
 	if err != nil {
 		panic(err)
@@ -61,10 +66,10 @@ func GetAllFriends(client *datastore.Client, ownerID string) []FriendInfo {
 		return getUserFriends(uids)
 	}
 
-	userBasedQuery := datastore.NewQuery("Friend").
+	userBasedQuery := datastore.NewQuery("FriendRequest").
 		Filter("UserID =", ownerID)
 
-	userBasedQueryFriends := []Friend{}
+	userBasedQueryFriends := []FriendRequest{}
 	_, err = client.GetAll(ctx, userBasedQuery, &userBasedQueryFriends)
 	if err != nil {
 		panic(err)
@@ -80,7 +85,7 @@ func GetAllFriends(client *datastore.Client, ownerID string) []FriendInfo {
 
 func DeleteFriend(client *datastore.Client, uuid string) {
 	ctx := context.Background()
-	key := datastore.NameKey("Friend", uuid, nil)
+	key := datastore.NameKey("FriendRequest", uuid, nil)
 	err := client.Delete(ctx, key)
 	if err != nil {
 		panic(err)
@@ -103,6 +108,7 @@ func SearchForFriendByEmail(email string) *FriendInfo {
 	if userRecord != nil {
 		return &FriendInfo{
 			UUID:        userRecord.UID,
+			UID:         userRecord.UID,
 			DisplayName: userRecord.DisplayName,
 			Email:       userRecord.Email,
 		}

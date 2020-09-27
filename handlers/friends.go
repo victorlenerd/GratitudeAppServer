@@ -8,6 +8,7 @@ import (
 	"gratitude/shared"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 	"time"
 )
 
@@ -15,7 +16,7 @@ type PutFriendRequestBody struct {
 	UUID    string `json:"uuid"`
 	UserID  string `json:"user_id"`
 	OwnerID string `json:"owner_id"`
-	Status 	models.FriendStatus
+	Status 	string `json:"status"`
 }
 
 func PutFriendHandler(w http.ResponseWriter, r *http.Request) {
@@ -47,12 +48,14 @@ func PutFriendHandler(w http.ResponseWriter, r *http.Request) {
 
 	client := db.GetClient()
 
-	friendModel := models.Friend{
+	status, err := strconv.Atoi(body.Status)
+
+	friendModel := models.FriendRequest{
 		UUID: body.UUID,
 		OwnerID: body.OwnerID,
 		UserID: body.UserID,
 		CreatedDate: time.Now(),
-		Status: body.Status,
+		Status: models.FriendStatus(status),
 	}
 
 	models.CreateFriends(client, friendModel)
