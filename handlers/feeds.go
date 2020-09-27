@@ -16,9 +16,6 @@ type Feed struct {
 }
 
 func FeedsHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Add("Access-Control-Allow-Origin", "*")
-	w.Header().Add("Content-Type", "application/json")
-
 	params := mux.Vars(r)
 	uuid := params["uuid"]
 

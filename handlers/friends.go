@@ -19,9 +19,6 @@ type PutFriendRequestBody struct {
 }
 
 func PutFriendHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Add("Access-Control-Allow-Origin", "*")
-	w.Header().Add("Content-Type", "application/json")
-
 	data, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		errorResponse := shared.ErrorResponse{
@@ -66,9 +63,6 @@ func PutFriendHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetOneFriendHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Add("Access-Control-Allow-Origin", "*")
-	w.Header().Add("Content-Type", "application/json")
-
 	email := r.URL.Query()["email"]
 
 	if email == nil || len(email[0]) < 1 {
@@ -96,9 +90,6 @@ func GetOneFriendHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetAllFriendHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Add("Access-Control-Allow-Origin", "*")
-	w.Header().Add("Content-Type", "application/json")
-
 	params := mux.Vars(r)
 
 	ownerID := params["ownerID"]
@@ -122,9 +113,6 @@ func GetAllFriendHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func DeleteFriendHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Add("Access-Control-Allow-Origin", "*")
-	w.Header().Add("Content-Type", "application/json")
-
 	params := mux.Vars(r)
 
 	uuid := params["uuid"]

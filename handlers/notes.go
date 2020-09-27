@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/gorilla/mux"
 	"gratitude/db"
 	"gratitude/models"
@@ -22,9 +23,6 @@ type PutNoteRequestBody struct {
 
 func PutNoteHandler(w http.ResponseWriter, r *http.Request) {
 	errorResponse := shared.ErrorResponse{}
-
-	w.Header().Add("Access-Control-Allow-Origin", "*")
-	w.Header().Add("Content-Type", "application/json")
 
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
@@ -48,7 +46,9 @@ func PutNoteHandler(w http.ResponseWriter, r *http.Request) {
 		Views:      noteBody.Views,
 		CreateDate: time.Now(),
 	}
-	
+
+	fmt.Println(note)
+
 	client := db.GetClient()
 	models.CreateNewNote(client, &note)
 
@@ -64,9 +64,6 @@ func PutNoteHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetAllNoteHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Add("Access-Control-Allow-Origin", "*")
-	w.Header().Add("Content-Type", "application/json")
-
 	if ownerID, ok := r.URL.Query()["ownerID"]; !ok || len(ownerID[0]) < 1 {
 		errorResponse := shared.ErrorResponse{
 			Message: "owner id is required",
@@ -89,9 +86,6 @@ func GetAllNoteHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func DeleteNoteHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Add("Access-Control-Allow-Origin", "*")
-	w.Header().Add("Content-Type", "application/json")
-
 	params := mux.Vars(r)
 
 	noteUUID := params["uuid"]

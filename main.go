@@ -18,6 +18,16 @@ func main() {
 	ctx := context.Background()
 	db.Init(ctx)
 
+	router.Use(mux.CORSMethodMiddleware(router))
+
+	router.Use(func(handler http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Add("Access-Control-Allow-Origin", "*")
+			w.Header().Add("Content-Type", "application/json")
+			handler.ServeHTTP(w, r)
+		})
+	})
+	
 	// Feeds endpoint
 	router.HandleFunc("/feeds/{uuid}", handlers.FeedsHandler).Methods(http.MethodGet)
 
