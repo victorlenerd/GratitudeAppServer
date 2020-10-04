@@ -44,6 +44,9 @@ func main() {
 	// Search Endpoint
 	router.HandleFunc("/search", handlers.GetOneFriendHandler).Methods(http.MethodGet)
 
+	// Welcome
+	router.HandleFunc("/", handlers.HelloHandler).Methods(http.MethodGet)
+
 	log.Println("Server is running on port", port)
 
 	err := http.ListenAndServe(":"+port, router)

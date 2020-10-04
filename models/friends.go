@@ -9,18 +9,12 @@ import (
 
 type FriendStatus int
 
-const (
-	Approved FriendStatus = iota + 1
-	Pending
-	Declined
-)
-
 type FriendRequest struct {
-	UUID        string
-	UserID      string
-	OwnerID     string
-	Status      FriendStatus
-	CreatedDate time.Time
+	UUID        string       `json:"uuid"`
+	UserID      string       `json:"user_id"`
+	OwnerID     string       `json:"owner_id"`
+	Status      string 		 `json:"status"`
+	CreatedDate time.Time    `json:"created_date"`
 }
 
 type FriendInfo struct {
@@ -31,8 +25,8 @@ type FriendInfo struct {
 }
 
 type FriendContainer struct {
-	friendInfo    FriendInfo    `json:"friend_info"`
-	friendRequest FriendRequest `json:"friend_request"`
+	Request FriendRequest `json:"request"`
+	Info    FriendInfo    `json:"info"`
 }
 
 func CreateFriends(client *datastore.Client, friend FriendRequest) {
@@ -44,43 +38,40 @@ func CreateFriends(client *datastore.Client, friend FriendRequest) {
 	}
 }
 
-func GetAllFriends(client *datastore.Client, ownerID string) []FriendInfo {
+func GetAllFriends(client *datastore.Client, ownerID string) []FriendContainer {
 	ctx := context.Background()
 
 	ownerBasedQuery := datastore.NewQuery("FriendRequest").
 		Filter("OwnerID =", ownerID)
 
-	ownerBasedQueryFriends := []FriendRequest{}
-	_, err := client.GetAll(ctx, ownerBasedQuery, &ownerBasedQueryFriends)
+	requests := []FriendRequest{}
+
+	_, err := client.GetAll(ctx, ownerBasedQuery, &requests)
 	if err != nil {
 		panic(err)
 	}
 
-	if len(ownerBasedQueryFriends) > 0 {
-		uids := [][]string{}
+	UIDS := [][]string{}
 
-		for _, userInfo := range ownerBasedQueryFriends {
-			uids = append(uids, []string{userInfo.UUID, userInfo.UserID})
+	if len(requests) > 0 {
+		for _, userInfo := range requests {
+			UIDS = append(UIDS, []string{userInfo.UUID, userInfo.UserID})
+		}
+	} else {
+		userBasedQuery := datastore.NewQuery("FriendRequest").
+			Filter("UserID =", ownerID)
+
+		_, err = client.GetAll(ctx, userBasedQuery, &requests)
+		if err != nil {
+			panic(err)
 		}
 
-		return getUserFriends(uids)
+		for _, userInfo := range requests {
+			UIDS = append(UIDS, []string{userInfo.UUID, userInfo.OwnerID})
+		}
 	}
 
-	userBasedQuery := datastore.NewQuery("FriendRequest").
-		Filter("UserID =", ownerID)
-
-	userBasedQueryFriends := []FriendRequest{}
-	_, err = client.GetAll(ctx, userBasedQuery, &userBasedQueryFriends)
-	if err != nil {
-		panic(err)
-	}
-
-	uids := [][]string{}
-	for _, userInfo := range userBasedQueryFriends {
-		uids = append(uids, []string{userInfo.UUID, userInfo.UserID})
-	}
-
-	return getUserFriends(uids)
+	return getUserFriends(UIDS, requests)
 }
 
 func DeleteFriend(client *datastore.Client, uuid string) {
@@ -117,8 +108,8 @@ func SearchForFriendByEmail(email string) *FriendInfo {
 	return nil
 }
 
-func getUserFriends(uids [][]string) []FriendInfo {
-	friendsInfo := []FriendInfo{}
+func getUserFriends(uids [][]string, requests []FriendRequest) []FriendContainer {
+	friends := []FriendContainer{}
 
 	ctx := context.Background()
 	app, err := firebase.NewApp(ctx, nil)
@@ -131,19 +122,22 @@ func getUserFriends(uids [][]string) []FriendInfo {
 		panic(err)
 	}
 
-	for _, uid := range uids {
+	for i, uid := range uids {
 		userRecord, _ := authClient.GetUser(ctx, uid[1])
 
 		if userRecord != nil {
-			friendsInfo = append(friendsInfo, FriendInfo{
-				UUID:        uid[0],
-				UID:         userRecord.UID,
-				DisplayName: userRecord.DisplayName,
-				Email:       userRecord.Email,
+			friends = append(friends, FriendContainer{
+				Info: FriendInfo{
+					UUID:        uid[0],
+					UID:         userRecord.UID,
+					DisplayName: userRecord.DisplayName,
+					Email:       userRecord.Email,
+				},
+				Request: requests[i],
 			})
 		}
 
 	}
 
-	return friendsInfo
+	return friends
 }

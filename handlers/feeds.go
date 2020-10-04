@@ -53,11 +53,13 @@ func FeedsHandler(w http.ResponseWriter, r *http.Request) {
 	feeds := []Feed{}
 
 	for _, friend := range friends {
-		notes := models.GetUserPublicNotes(client, friend.UID, offset)
-		feeds = append(feeds, Feed{
-			Notes:  notes,
-			Friend: friend,
-		})
+		if friend.Request.Status == "3" {
+			notes := models.GetUserPublicNotes(client, friend.Info.UID, offset)
+			feeds = append(feeds, Feed{
+				Notes:  notes,
+				Friend: friend.Info,
+			})
+		}
 	}
 
 	data, _ := json.Marshal(feeds)

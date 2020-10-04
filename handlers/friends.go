@@ -8,7 +8,6 @@ import (
 	"gratitude/shared"
 	"io/ioutil"
 	"net/http"
-	"strconv"
 	"time"
 )
 
@@ -48,14 +47,12 @@ func PutFriendHandler(w http.ResponseWriter, r *http.Request) {
 
 	client := db.GetClient()
 
-	status, err := strconv.Atoi(body.Status)
-
 	friendModel := models.FriendRequest{
 		UUID: body.UUID,
 		OwnerID: body.OwnerID,
 		UserID: body.UserID,
 		CreatedDate: time.Now(),
-		Status: models.FriendStatus(status),
+		Status: body.Status,
 	}
 
 	models.CreateFriends(client, friendModel)
