@@ -16,9 +16,11 @@ API for sharing notes and connecting with friends using the app.
 
 Set the following environment variables
 
+```
 * PORT
 * DATASTORE_EMULATOR_HOST
 * GOOGLE_APPLICATION_CREDENTIALS
+```
 
 ## API Documentation
 
