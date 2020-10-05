@@ -4,7 +4,7 @@ Backend Server For Gratitude App.
 API for sharing notes and connecting with friends using the app.
 
 
-## Features
+## Features & Integrations
 
 * Go Firebase Admin SDK Integration
     * Searching the user database with email
