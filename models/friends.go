@@ -30,6 +30,8 @@ type FriendContainer struct {
 	Info    FriendInfo    `json:"info"`
 }
 
+var firebaseAppOpts = option.WithCredentialsFile("gratitude-8563a-firebase-adminsdk-om7ze-7f87952725.json")
+
 func CreateFriends(client *datastore.Client, friend FriendRequest) {
 	ctx := context.Background()
 	key := datastore.NameKey("FriendRequest", friend.UUID, nil)
@@ -86,7 +88,7 @@ func DeleteFriend(client *datastore.Client, uuid string) {
 
 func SearchForFriendByEmail(email string) *FriendInfo {
 	ctx := context.Background()
-	app, err := firebase.NewApp(ctx, nil)
+	app, err := firebase.NewApp(ctx, nil, firebaseAppOpts)
 	if err != nil {
 		panic(err)
 	}
@@ -110,12 +112,10 @@ func SearchForFriendByEmail(email string) *FriendInfo {
 }
 
 func getUserFriends(uids [][]string, requests []FriendRequest) []FriendContainer {
-	opts := option.WithCredentialsFile("gratitude-8563a-firebase-adminsdk-om7ze-7f87952725.json")
-
 	friends := []FriendContainer{}
 	ctx := context.Background()
 
-	app, err := firebase.NewApp(ctx, nil, opts)
+	app, err := firebase.NewApp(ctx, nil, firebaseAppOpts)
 	if err != nil {
 		panic(err)
 	}
