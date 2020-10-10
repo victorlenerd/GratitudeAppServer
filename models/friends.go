@@ -4,6 +4,7 @@ import (
 	"cloud.google.com/go/datastore"
 	"context"
 	firebase "firebase.google.com/go"
+	"google.golang.org/api/option"
 	"time"
 )
 
@@ -109,10 +110,12 @@ func SearchForFriendByEmail(email string) *FriendInfo {
 }
 
 func getUserFriends(uids [][]string, requests []FriendRequest) []FriendContainer {
-	friends := []FriendContainer{}
+	opts := option.WithCredentialsFile("gratitude-8563a-firebase-adminsdk-om7ze-7f87952725.json")
 
+	friends := []FriendContainer{}
 	ctx := context.Background()
-	app, err := firebase.NewApp(ctx, nil)
+
+	app, err := firebase.NewApp(ctx, nil, opts)
 	if err != nil {
 		panic(err)
 	}
