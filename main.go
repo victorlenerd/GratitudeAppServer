@@ -42,7 +42,7 @@ func main() {
 	router.HandleFunc("/notes/{uuid}", handlers.DeleteNoteHandler).Methods(http.MethodDelete)
 
 	// User Firebase Messaging Tokens Endpoint
-	router.HandleFunc("/tokens", handlers.PutUserToken).Methods(http.MethodPut)
+	router.HandleFunc("/tokens/{ownerID}", handlers.PutUserToken).Methods(http.MethodPut)
 
 	// Search Endpoint
 	router.HandleFunc("/search", handlers.SearchFriendHandler).Methods(http.MethodGet)

@@ -17,7 +17,7 @@ func PutUserToken(client *datastore.Client, userID string, FCMToken string)  {
 		UserID: userID,
 		Token:  FCMToken,
 	}
-	_, err := client.Put(ctx, key, token)
+	_, err := client.Put(ctx, key, &token)
 	if err != nil {
 		panic(err)
 	}
