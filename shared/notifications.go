@@ -38,7 +38,6 @@ func SendFeedsNotifications(userID string) {
 		panic(err)
 	}
 
-
 	userInfo, err := authClient.GetUser(ctx, userID)
 	if err != nil {
 		panic(err)
@@ -48,6 +47,44 @@ func SendFeedsNotifications(userID string) {
 	notification := &messaging.Notification{
 		Title: "New Feed Note",
 		Body: 	userInfo.DisplayName+" shared a note",
+	}
+
+	message := &messaging.MulticastMessage{
+		Tokens: tokens,
+		Notification: notification,
+	}
+	_, err = messagingClient.SendMulticast(ctx, message)
+	if err != nil {
+		panic(err)
+	}
+}
+
+func SendPendingFriendRequestNotification(userID string, friendID string) {
+	ctx := context.Background()
+	app, err := firebase.NewApp(ctx, nil, FirebaseAppOpts)
+	if err != nil {
+		panic(err)
+	}
+
+	messagingClient, err := app.Messaging(ctx)
+	if err != nil {
+		panic(err)
+	}
+
+	authClient, err := app.Auth(ctx)
+	if err != nil {
+		panic(err)
+	}
+	dbClient := db.GetClient()
+	tokens := models.GetUsersToken(dbClient, []string{friendID})
+	userInfo, err := authClient.GetUser(ctx, userID)
+	if err != nil {
+		panic(err)
+	}
+
+	notification := &messaging.Notification{
+		Title: "Friend Request",
+		Body: 	userInfo.DisplayName+" wants to be your friend",
 	}
 	message := &messaging.MulticastMessage{
 		Tokens: tokens,

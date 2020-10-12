@@ -57,6 +57,10 @@ func PutFriendHandler(w http.ResponseWriter, r *http.Request) {
 
 	models.CreateFriends(client, friendModel)
 
+	if friendModel.Status == "1" {
+		shared.SendPendingFriendRequestNotification(friendModel.OwnerID, friendModel.UserID)
+	}
+
 	data, _ = json.Marshal(friendModel)
 	w.WriteHeader(http.StatusCreated)
 	w.Write(data)
