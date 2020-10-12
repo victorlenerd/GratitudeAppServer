@@ -25,15 +25,15 @@ func PutUserToken(client *datastore.Client, userID string, FCMToken string)  {
 
 func GetUsersToken(client *datastore.Client, userIDs []string) []string {
 	ctx := context.Background()
-	keys :=	make([]*datastore.Key, len(userIDs))
+	keys :=	[]*datastore.Key{}
 
 	for _, uuid := range userIDs {
 		keys = append(keys, datastore.NameKey("UserToken", uuid, nil))
 	}
 
-	userTokens := []UserToken{}
+	userTokens := make([]UserToken, len(keys))
 
-	err := client.GetMulti(ctx, keys, &userTokens)
+	err := client.GetMulti(ctx, keys, userTokens)
 	if err != nil {
 		panic(err)
 	}
