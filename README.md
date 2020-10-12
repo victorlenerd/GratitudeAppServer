@@ -14,7 +14,7 @@ API for sharing notes and connecting with friends using the app.
 
 ## Usage
 
-Set the following environment variables
+Set the following environment variables when running locally
 
 ```
 * PORT
@@ -30,6 +30,12 @@ Endpoint          | Method | Description
 /search           | GET    | Search for a user on the app             
 /tokens/{userID}  | PUT    | Create or update token for a user
 /feeds/{userID}   | GET    | Get all notes shared on feed by friends of user
+/friends          | PUT    | Create a friend request or update a friend request
+/friends/{userID} | GET    | Get all friends for a user
+/friends/{uuid}   | DELETE | Delete friend request
+/notes            | GET    | Get all notes for a user
+/notes            | PUT    | Upload a note or share a note to a feed
+/notes/{uuid}     | DELETE | Delete a note
 
 ## License
 
