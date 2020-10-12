@@ -38,7 +38,8 @@ func GetUsersToken(client *datastore.Client, userIDs []string) []string {
 		panic(err)
 	}
 
-	tokens := make([]string, len(userIDs))
+	tokens := []string{}
+
 	for _, userToken := range userTokens {
 		tokens = append(tokens, userToken.Token)
 	}
