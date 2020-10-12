@@ -33,6 +33,10 @@ func SendFeedsNotifications(userID string) {
 		}
 	}
 
+	if len(userIDs) < 1 {
+		return
+	}
+
 	authClient, err := app.Auth(ctx)
 	if err != nil {
 		panic(err)
