@@ -25,7 +25,7 @@ func SendFeedsNotifications(userID string) {
 
 	dbClient := db.GetClient()
 	friends := models.GetAllFriends(dbClient, userID)
-	userIDs := make([]string, len(friends))
+	userIDs := []string{}
 
 	for _, friend := range friends {
 		if friend.Request.Status == "3" {
