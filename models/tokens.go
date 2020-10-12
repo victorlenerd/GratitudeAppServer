@@ -31,7 +31,7 @@ func GetUsersToken(client *datastore.Client, userIDs []string) []string {
 		keys = append(keys, datastore.NameKey("UserToken", uuid, nil))
 	}
 
-	userTokens := make([]UserToken, len(keys))
+	userTokens := []UserToken{}
 
 	err := client.GetMulti(ctx, keys, userTokens)
 	if err != nil {
