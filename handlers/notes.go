@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/gorilla/mux"
 	"gratitude/db"
 	"gratitude/models"
@@ -47,8 +46,6 @@ func PutNoteHandler(w http.ResponseWriter, r *http.Request) {
 		CreateDate: time.Now(),
 	}
 
-	fmt.Println(note)
-
 	client := db.GetClient()
 	models.CreateNewNote(client, &note)
 
@@ -57,6 +54,10 @@ func PutNoteHandler(w http.ResponseWriter, r *http.Request) {
 		data, _ := json.Marshal(&errorResponse)
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write(data)
+	}
+
+	if note.IsPublic {
+		shared.SendFeedsNotifications(note.OwnerID)
 	}
 
 	w.WriteHeader(http.StatusCreated)

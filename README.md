@@ -24,7 +24,12 @@ Set the following environment variables
 
 ## API Documentation
 
-
+Endpoint          | Method | Description  
+------------------| ------ | ----------- 
+/                 | GET    | Welcome      
+/search           | GET    | Search for a user on the app             
+/tokens/{userID}  | PUT    | Create or update token for a user
+/feeds/{userID}   | GET    | Get all notes shared on feed by friends of user
 
 ## License
 
